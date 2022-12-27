@@ -1,5 +1,11 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { useState } from "react";
+import Web3 from "web3";
+import { MINT_NFT_ABI, MINT_NFT_CONTRACT } from "./web3.config";
+
+const web3 = new Web3(window.ethereum);
+
+const mintContract = new web3.eth.Contract(MINT_NFT_ABI, MINT_NFT_CONTRACT);
 
 const App = () => {
   const [account, setAccount] = useState("");
@@ -24,9 +30,42 @@ const App = () => {
     setAccount("");
   };
 
+  const mint = async () => {
+    try {
+      if (!account) return;
+
+      const mintNFT = await mintContract.methods
+        .mintNFT()
+        .send({ from: account });
+
+      if (mintNFT.status) {
+        const balanceOf = await mintContract.methods.balanceOf(account).call();
+
+        const tokenByIndex = await mintContract.methods
+          .tokenByIndex(balanceOf - 1)
+          .call();
+
+        const tokenURI = await mintContract.methods
+          .tokenURI(tokenByIndex)
+          .call();
+
+        console.log(tokenURI);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <Box minH="100vh">
-      <Box bgColor="yellow.100" px={4} py={8} textAlign="center">
+    <Box>
+      <Box
+        position="absolute"
+        width="100%"
+        bgColor="yellow.100"
+        px={4}
+        py={8}
+        textAlign="center"
+      >
         {account ? (
           <Box fontWeight="bold">
             Hello, {account.substring(0, 4)}...
@@ -41,6 +80,17 @@ const App = () => {
           </Button>
         )}
       </Box>
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        minH="100vh"
+      >
+        <Box width={512} height={512} bgColor="gray.100" border="2px"></Box>
+        <Button mt={8} onClick={mint}>
+          Minting
+        </Button>
+      </Flex>
     </Box>
   );
 };

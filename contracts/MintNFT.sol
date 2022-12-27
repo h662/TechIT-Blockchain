@@ -31,15 +31,4 @@
     function tokenURI(uint _tokenId) public override view returns(string memory) {
         return string(abi.encodePacked(metadataURI, '/', Strings.toString(_tokenId), '.json'));
     }
-
-    function getNFTs(address _owner) public view returns(uint[] memory) {
-        require(balanceOf(_owner) > 0, "Owner does not have NFT.");
-        uint[] memory myNFTs = new uint[](balanceOf(_owner));
-        
-        for(uint i = 0; i < balanceOf(_owner); i++) {
-            myNFTs[i] = tokenOfOwnerByIndex(_owner, i); 
-        }
- 
-        return myNFTs;
-    }
  }
