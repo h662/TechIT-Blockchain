@@ -1,7 +1,8 @@
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Image } from "@chakra-ui/react";
 import { useState } from "react";
 import Web3 from "web3";
 import { MINT_NFT_ABI, MINT_NFT_CONTRACT } from "./web3.config";
+import axios from "axios";
 
 const web3 = new Web3(window.ethereum);
 
@@ -9,6 +10,7 @@ const mintContract = new web3.eth.Contract(MINT_NFT_ABI, MINT_NFT_CONTRACT);
 
 const App = () => {
   const [account, setAccount] = useState("");
+  const [src, setSrc] = useState("");
 
   const getAccount = async () => {
     try {
@@ -49,7 +51,9 @@ const App = () => {
           .tokenURI(tokenByIndex)
           .call();
 
-        console.log(tokenURI);
+        const response = await axios.get(tokenURI);
+
+        setSrc(response.data.image);
       }
     } catch (error) {
       console.error(error);
@@ -86,7 +90,11 @@ const App = () => {
         alignItems="center"
         minH="100vh"
       >
-        <Box width={512} height={512} bgColor="gray.100" border="2px"></Box>
+        {src ? (
+          <Image src={src} alt="NFT" />
+        ) : (
+          <Box width={512} height={512} bgColor="gray.100" border="2px" />
+        )}
         <Button mt={8} onClick={mint}>
           Minting
         </Button>
