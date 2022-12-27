@@ -4,9 +4,8 @@
 
  import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  import "@openzeppelin/contracts/utils/Strings.sol";
- import "@openzeppelin/contracts/access/Ownable.sol";
 
- contract MintNFT is ERC721Enumerable, Ownable {
+ contract MintNFT is ERC721Enumerable {
     string public metadataURI;
     uint public totalNFT;
 
@@ -15,7 +14,7 @@
         totalNFT = _totalNFT;
     }
 
-    function mintNFT() public onlyOwner {
+    function mintNFT() public {
         require(totalNFT > totalSupply(), "No more mint.");
 
         uint tokenId = totalSupply() + 1;
@@ -23,7 +22,7 @@
         _mint(msg.sender, tokenId);
     }
 
-    function batchMint(uint _amount) public onlyOwner {
+    function batchMint(uint _amount) public {
         for(uint i = 0; i < _amount; i++) {
             mintNFT();
         }
